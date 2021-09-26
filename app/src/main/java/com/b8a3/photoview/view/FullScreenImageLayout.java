@@ -6,16 +6,13 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.github.chrisbanes.photoview.PhotoView;
-
-public class FullScreenImageLayout extends FrameLayout implements OnGestureViewListener{
+public class FullScreenImageLayout extends FrameLayout implements OnGestureViewListener {
 
 
     final FrameLayout mFullScreenContainer = new FrameLayout(getContext());
@@ -39,21 +36,23 @@ public class FullScreenImageLayout extends FrameLayout implements OnGestureViewL
         FullViewAttacher attacher = new FullViewAttacher(this, this);
     }
 
-    public void showViewFullScreen(final ImageView targetView1) {
+    public void showViewFullScreen(final View tView) {
 
         long l = System.currentTimeMillis();
 
-        final ViewGroup.LayoutParams tarP = targetView1.getLayoutParams();
-//        targetView1.setDrawingCacheEnabled(true);
+        final ViewGroup.LayoutParams tarP = tView.getLayoutParams();
+        tView.setDrawingCacheEnabled(true);
 
         Rect rectG = new Rect();
-        targetView1.getGlobalVisibleRect(rectG);
+        Rect rectL = new Rect();
+        tView.getGlobalVisibleRect(rectG);
+        tView.getLocalVisibleRect(rectL);
 
         mFullScreenContainer.removeAllViews();
-        PhotoView targetView = new PhotoView(getContext());
+        ImageView scaleView = new ImageView(getContext());
 
 
-        targetView.setImageDrawable(targetView1.getDrawable());
+        scaleView.setImageBitmap(tView.getDrawingCache());
         WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
         layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
         layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
@@ -63,18 +62,17 @@ public class FullScreenImageLayout extends FrameLayout implements OnGestureViewL
         layoutParams.format = PixelFormat.RGBA_8888;//让背景透明，放大过程可以看到当前界面
         windowManager.addView(mFullScreenContainer, layoutParams);
 
-        ((ImageView) targetView).setScaleType(ImageView.ScaleType.FIT_CENTER);
-
-        final FrameLayout.LayoutParams hParams = new FrameLayout.LayoutParams(targetView1.getWidth(), targetView1.getHeight());
+        final FrameLayout.LayoutParams hParams = new FrameLayout.LayoutParams(tView.getWidth(), tView.getHeight());
 
 
-        if (rectG.bottom - rectG.top < targetView1.getHeight() && rectG.bottom < windowManager.getDefaultDisplay().getHeight()) {
-            hParams.topMargin = rectG.bottom - targetView1.getHeight();
+        //顶部露出半截
+        if (rectL.height() > 0 && rectL.height() < tView.getHeight() && rectL.bottom == tView.getHeight()) {
+            hParams.topMargin = rectG.bottom - tView.getHeight();
         } else {
             hParams.topMargin = rectG.top;
         }
         hParams.leftMargin = rectG.left;
-        mFullScreenContainer.addView(targetView, hParams);
+        mFullScreenContainer.addView(scaleView, hParams);
     }
 
     private void backToNormal() {
@@ -83,7 +81,7 @@ public class FullScreenImageLayout extends FrameLayout implements OnGestureViewL
 
     @Override
     public void onScaleBegin() {
-        showViewFullScreen((ImageView) getChildAt(0));
+        showViewFullScreen(getChildAt(0));
     }
 
     @Override

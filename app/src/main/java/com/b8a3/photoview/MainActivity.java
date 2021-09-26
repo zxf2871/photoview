@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.github.chrisbanes.photoview.PhotoView;
@@ -20,7 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
-    private FrameLayout mContainer;
+    private LinearLayout mContainer;
 
     int mScreenWidth;
     int mScreenHeight;
