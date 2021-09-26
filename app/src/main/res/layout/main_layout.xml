@@ -17,97 +17,82 @@
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:text="@string/app_name" />
-            <TextView
+
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:text="@string/app_name" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:text="@string/app_name" />
-            <com.b8a3.photoview.FullScreenImageLayout
-                android:id="@+id/p0"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/car_"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:text="@string/app_name" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:text="@string/app_name" />
-            <com.yalantis.ucrop.view.GestureCropImageView
-                android:id="@+id/p2"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/car_"
-                android:layout_width="300dp"
-                android:layout_height="300dp"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:text="@string/app_name" />
+                android:layout_height="wrap_content"
+                android:background="#33ff0000">
+
+                <com.b8a3.photoview.view.FullScreenImageLayout
+                    android:id="@+id/p0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/car_" />
+                </com.b8a3.photoview.view.FullScreenImageLayout>
+            </FrameLayout>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:text="@string/app_name" />
 
-            <com.ortiz.touchview.TouchImageView
-                android:id="@+id/p3"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/car_"
-                android:layout_width="300dp"
-                android:layout_height="300dp"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:text="@string/app_name" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:text="@string/app_name" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:text="@string/app_name" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:text="@string/app_name" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:text="@string/app_name" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:text="@string/app_name" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:text="@string/app_name" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:text="@string/app_name" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:text="@string/app_name" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:text="@string/app_name" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:text="@string/app_name" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:text="@string/app_name" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
