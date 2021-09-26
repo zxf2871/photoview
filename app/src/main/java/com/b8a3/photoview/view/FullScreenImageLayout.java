@@ -3,6 +3,7 @@ package com.b8a3.photoview.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -14,7 +15,7 @@ import android.widget.ImageView;
 
 import com.github.chrisbanes.photoview.PhotoView;
 
-public class FullScreenImageLayout extends FrameLayout {
+public class FullScreenImageLayout extends FrameLayout implements OnGestureViewListener{
 
 
     final FrameLayout mFullScreenContainer = new FrameLayout(getContext());
@@ -35,6 +36,7 @@ public class FullScreenImageLayout extends FrameLayout {
 
     private void init() {
         setBackgroundColor(Color.argb(100, 255, 255, 0));
+        FullViewAttacher attacher = new FullViewAttacher(this, this);
     }
 
     public void showViewFullScreen(final ImageView targetView1) {
@@ -43,6 +45,9 @@ public class FullScreenImageLayout extends FrameLayout {
 
         final ViewGroup.LayoutParams tarP = targetView1.getLayoutParams();
 //        targetView1.setDrawingCacheEnabled(true);
+
+        Rect rectG = new Rect();
+        targetView1.getGlobalVisibleRect(rectG);
 
         mFullScreenContainer.removeAllViews();
         PhotoView targetView = new PhotoView(getContext());
@@ -61,29 +66,34 @@ public class FullScreenImageLayout extends FrameLayout {
         ((ImageView) targetView).setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         final FrameLayout.LayoutParams hParams = new FrameLayout.LayoutParams(targetView1.getWidth(), targetView1.getHeight());
-        hParams.leftMargin = 100;
-        hParams.topMargin = 300;
+
+
+        if (rectG.bottom - rectG.top < targetView1.getHeight() && rectG.bottom < windowManager.getDefaultDisplay().getHeight()) {
+            hParams.topMargin = rectG.bottom - targetView1.getHeight();
+        } else {
+            hParams.topMargin = rectG.top;
+        }
+        hParams.leftMargin = rectG.left;
         mFullScreenContainer.addView(targetView, hParams);
-
-        Log.e("------>", "添加时间:" + (System.currentTimeMillis()-l));
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                showViewFullScreen((ImageView) getChildAt(0));
-                return true;
-        }
-
-
-        if (event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_UP) {
-            backToNormal();
-        }
-        return super.onTouchEvent(event);
     }
 
     private void backToNormal() {
         windowManager.removeView(mFullScreenContainer);
+    }
+
+    @Override
+    public void onScaleBegin() {
+        showViewFullScreen((ImageView) getChildAt(0));
+    }
+
+    @Override
+    public void onScaleEnd() {
+        backToNormal();
+
+    }
+
+    @Override
+    public void onScale(float scaleFactor, float focusX, float focusY) {
+        Log.e("------>", "scaleFactor:" + scaleFactor + " focusX:" + focusX + " focusY:" + focusY);
     }
 }
