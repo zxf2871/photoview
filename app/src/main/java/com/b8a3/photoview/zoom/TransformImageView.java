@@ -1,4 +1,4 @@
-package com.yalantis.ucrop.view;
+package com.b8a3.photoview.zoom;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,18 +6,12 @@ import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.yalantis.ucrop.callback.BitmapLoadCallback;
-import com.yalantis.ucrop.model.ExifInfo;
-import com.yalantis.ucrop.util.BitmapLoadUtils;
-import com.yalantis.ucrop.util.FastBitmapDrawable;
-import com.yalantis.ucrop.util.RectUtils;
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
 
 /**
  * Created by Oleksii Shliama (https://github.com/shliama).
@@ -51,8 +45,6 @@ public class TransformImageView extends ImageView {
 
     private int mMaxBitmapSize = 0;
 
-    private String mImageInputPath, mImageOutputPath;
-    private ExifInfo mExifInfo;
 
     /**
      * Interface for rotation and scale change notifying.
@@ -105,61 +97,12 @@ public class TransformImageView extends ImageView {
         mMaxBitmapSize = maxBitmapSize;
     }
 
-    public int getMaxBitmapSize() {
-        if (mMaxBitmapSize <= 0) {
-            mMaxBitmapSize = BitmapLoadUtils.calculateMaxBitmapSize(getContext());
-        }
-        return mMaxBitmapSize;
-    }
 
     @Override
     public void setImageBitmap(final Bitmap bitmap) {
         setImageDrawable(new FastBitmapDrawable(bitmap));
     }
 
-    public String getImageInputPath() {
-        return mImageInputPath;
-    }
-
-    public String getImageOutputPath() {
-        return mImageOutputPath;
-    }
-
-    public ExifInfo getExifInfo() {
-        return mExifInfo;
-    }
-
-    /**
-     * This method takes an Uri as a parameter, then calls method to decode it into Bitmap with specified size.
-     *
-     * @param imageUri - image Uri
-     * @throws Exception - can throw exception if having problems with decoding Uri or OOM.
-     */
-    public void setImageUri(@NonNull Uri imageUri, @Nullable Uri outputUri) throws Exception {
-        int maxBitmapSize = getMaxBitmapSize();
-
-        BitmapLoadUtils.decodeBitmapInBackground(getContext(), imageUri, outputUri, maxBitmapSize, maxBitmapSize,
-                new BitmapLoadCallback() {
-
-                    @Override
-                    public void onBitmapLoaded(@NonNull Bitmap bitmap, @NonNull ExifInfo exifInfo, @NonNull String imageInputPath, @Nullable String imageOutputPath) {
-                        mImageInputPath = imageInputPath;
-                        mImageOutputPath = imageOutputPath;
-                        mExifInfo = exifInfo;
-
-                        mBitmapDecoded = true;
-                        setImageBitmap(bitmap);
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Exception bitmapWorkerException) {
-                        Log.e(TAG, "onFailure: setImageUri", bitmapWorkerException);
-                        if (mTransformImageListener != null) {
-                            mTransformImageListener.onLoadFailure(bitmapWorkerException);
-                        }
-                    }
-                });
-    }
 
     /**
      * @return - current image scale value.
@@ -199,15 +142,6 @@ public class TransformImageView extends ImageView {
         updateCurrentImagePoints();
     }
 
-    @Nullable
-    public Bitmap getViewBitmap() {
-        if (getDrawable() == null || !(getDrawable() instanceof FastBitmapDrawable)) {
-            return null;
-        } else {
-            return ((FastBitmapDrawable) getDrawable()).getBitmap();
-        }
-    }
-
     /**
      * This method translates current image.
      *
@@ -238,22 +172,6 @@ public class TransformImageView extends ImageView {
         }
     }
 
-    /**
-     * This method rotates current image.
-     *
-     * @param deltaAngle - rotation angle
-     * @param px         - rotation center X
-     * @param py         - rotation center Y
-     */
-    public void postRotate(float deltaAngle, float px, float py) {
-        if (deltaAngle != 0) {
-            mCurrentImageMatrix.postRotate(deltaAngle, px, py);
-            setImageMatrix(mCurrentImageMatrix);
-            if (mTransformImageListener != null) {
-                mTransformImageListener.onRotate(getMatrixAngle(mCurrentImageMatrix));
-            }
-        }
-    }
 
     protected void init() {
         setScaleType(ScaleType.MATRIX);

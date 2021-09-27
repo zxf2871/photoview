@@ -1,4 +1,4 @@
-package com.yalantis.ucrop.view;
+package com.b8a3.photoview.zoom;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -6,17 +6,14 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
-import com.yalantis.ucrop.util.RotationGestureDetector;
-
 /**
  * Created by Oleksii Shliama (https://github.com/shliama).
  */
-public class GestureCropImageView extends CropImageView {
+public class ZoomImageView extends CropImageView {
 
     private static final int DOUBLE_TAP_ZOOM_DURATION = 200;
 
     private ScaleGestureDetector mScaleDetector;
-    private RotationGestureDetector mRotateDetector;
     private GestureDetector mGestureDetector;
 
     private float mMidPntX, mMidPntY;
@@ -24,15 +21,15 @@ public class GestureCropImageView extends CropImageView {
     private boolean mIsRotateEnabled = true, mIsScaleEnabled = true;
     private int mDoubleTapScaleSteps = 5;
 
-    public GestureCropImageView(Context context) {
+    public ZoomImageView(Context context) {
         super(context);
     }
 
-    public GestureCropImageView(Context context, AttributeSet attrs) {
+    public ZoomImageView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public GestureCropImageView(Context context, AttributeSet attrs, int defStyle) {
+    public ZoomImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
@@ -83,10 +80,6 @@ public class GestureCropImageView extends CropImageView {
             mScaleDetector.onTouchEvent(event);
         }
 
-        if (mIsRotateEnabled) {
-            mRotateDetector.onTouchEvent(event);
-        }
-
         if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
             setImageToWrapCropBounds();
         }
@@ -111,7 +104,6 @@ public class GestureCropImageView extends CropImageView {
     private void setupGestureListeners() {
         mGestureDetector = new GestureDetector(getContext(), new GestureListener(), null, true);
         mScaleDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
-        mRotateDetector = new RotationGestureDetector(new RotateListener());
     }
 
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
@@ -120,6 +112,18 @@ public class GestureCropImageView extends CropImageView {
         public boolean onScale(ScaleGestureDetector detector) {
             postScale(detector.getScaleFactor(), mMidPntX, mMidPntY);
             return true;
+        }
+
+        @Override
+        public boolean onScaleBegin(ScaleGestureDetector detector) {
+            getParent().requestDisallowInterceptTouchEvent(true);
+            return true;
+        }
+
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector) {
+            getParent().requestDisallowInterceptTouchEvent(false);
+            super.onScaleEnd(detector);
         }
     }
 
@@ -134,16 +138,6 @@ public class GestureCropImageView extends CropImageView {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             postTranslate(-distanceX, -distanceY);
-            return true;
-        }
-
-    }
-
-    private class RotateListener extends RotationGestureDetector.SimpleOnRotationGestureListener {
-
-        @Override
-        public boolean onRotation(RotationGestureDetector rotationDetector) {
-            postRotate(rotationDetector.getAngle(), mMidPntX, mMidPntY);
             return true;
         }
 

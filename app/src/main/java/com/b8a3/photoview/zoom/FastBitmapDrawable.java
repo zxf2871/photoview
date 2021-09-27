@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.yalantis.ucrop.util;
+package com.b8a3.photoview.zoom;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

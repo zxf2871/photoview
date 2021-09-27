@@ -1,24 +1,10 @@
-package com.yalantis.ucrop.view;
+package com.b8a3.photoview.zoom;
 
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.util.AttributeSet;
-
-import com.yalantis.ucrop.R;
-import com.yalantis.ucrop.callback.BitmapCropCallback;
-import com.yalantis.ucrop.callback.CropBoundsChangeListener;
-import com.yalantis.ucrop.model.CropParameters;
-import com.yalantis.ucrop.model.ImageState;
-import com.yalantis.ucrop.task.BitmapCropTask;
-import com.yalantis.ucrop.util.CubicEasing;
-import com.yalantis.ucrop.util.RectUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -41,10 +27,7 @@ public class CropImageView extends TransformImageView {
 
     private final Matrix mTempMatrix = new Matrix();
 
-    private float mTargetAspectRatio;
     private float mMaxScaleMultiplier = DEFAULT_MAX_SCALE_MULTIPLIER;
-
-    private CropBoundsChangeListener mCropBoundsChangeListener;
 
     private Runnable mWrapCropBoundsRunnable, mZoomImageToPositionRunnable = null;
 
@@ -64,26 +47,6 @@ public class CropImageView extends TransformImageView {
         super(context, attrs, defStyle);
     }
 
-    /**
-     * Cancels all current animations and sets image to fill crop area (without animation).
-     * Then creates and executes {@link BitmapCropTask} with proper parameters.
-     */
-    public void cropAndSaveImage(@NonNull Bitmap.CompressFormat compressFormat, int compressQuality,
-                                 @Nullable BitmapCropCallback cropCallback) {
-        cancelAllAnimations();
-        setImageToWrapCropBounds(false);
-
-        final ImageState imageState = new ImageState(
-                mCropRect, RectUtils.trapToRect(mCurrentImageCorners),
-                getCurrentScale(), getCurrentAngle());
-
-        final CropParameters cropParameters = new CropParameters(
-                mMaxResultImageSizeX, mMaxResultImageSizeY,
-                compressFormat, compressQuality,
-                getImageInputPath(), getImageOutputPath(), getExifInfo());
-
-        new BitmapCropTask(getViewBitmap(), imageState, cropParameters, cropCallback).execute();
-    }
 
     /**
      * @return - maximum scale value for current image and crop ratio
@@ -99,91 +62,8 @@ public class CropImageView extends TransformImageView {
         return mMinScale;
     }
 
-    /**
-     * @return - aspect ratio for crop bounds
-     */
-    public float getTargetAspectRatio() {
-        return mTargetAspectRatio;
-    }
 
-    /**
-     * Updates current crop rectangle with given. Also recalculates image properties and position
-     * to fit new crop rectangle.
-     *
-     * @param cropRect - new crop rectangle
-     */
-    public void setCropRect(RectF cropRect) {
-        mTargetAspectRatio = cropRect.width() / cropRect.height();
-        mCropRect.set(cropRect.left - getPaddingLeft(), cropRect.top - getPaddingTop(),
-                cropRect.right - getPaddingRight(), cropRect.bottom - getPaddingBottom());
-        calculateImageScaleBounds();
-        setImageToWrapCropBounds();
-    }
 
-    /**
-     * This method sets aspect ratio for crop bounds.
-     * If {@link #SOURCE_IMAGE_ASPECT_RATIO} value is passed - aspect ratio is calculated
-     * based on current image width and height.
-     *
-     * @param targetAspectRatio - aspect ratio for image crop (e.g. 1.77(7) for 16:9)
-     */
-    public void setTargetAspectRatio(float targetAspectRatio) {
-        final Drawable drawable = getDrawable();
-        if (drawable == null) {
-            mTargetAspectRatio = targetAspectRatio;
-            return;
-        }
-
-        if (targetAspectRatio == SOURCE_IMAGE_ASPECT_RATIO) {
-            mTargetAspectRatio = drawable.getIntrinsicWidth() / (float) drawable.getIntrinsicHeight();
-        } else {
-            mTargetAspectRatio = targetAspectRatio;
-        }
-
-        if (mCropBoundsChangeListener != null) {
-            mCropBoundsChangeListener.onCropAspectRatioChanged(mTargetAspectRatio);
-        }
-    }
-
-    @Nullable
-    public CropBoundsChangeListener getCropBoundsChangeListener() {
-        return mCropBoundsChangeListener;
-    }
-
-    public void setCropBoundsChangeListener(@Nullable CropBoundsChangeListener cropBoundsChangeListener) {
-        mCropBoundsChangeListener = cropBoundsChangeListener;
-    }
-
-    /**
-     * This method sets maximum width for resulting cropped image
-     *
-     * @param maxResultImageSizeX - size in pixels
-     */
-    public void setMaxResultImageSizeX(@IntRange(from = 10) int maxResultImageSizeX) {
-        mMaxResultImageSizeX = maxResultImageSizeX;
-    }
-
-    /**
-     * This method sets maximum width for resulting cropped image
-     *
-     * @param maxResultImageSizeY - size in pixels
-     */
-    public void setMaxResultImageSizeY(@IntRange(from = 10) int maxResultImageSizeY) {
-        mMaxResultImageSizeY = maxResultImageSizeY;
-    }
-
-    /**
-     * This method sets animation duration for image to wrap the crop bounds
-     *
-     * @param imageToWrapCropBoundsAnimDuration - duration in milliseconds
-     */
-    public void setImageToWrapCropBoundsAnimDuration(@IntRange(from = 100) long imageToWrapCropBoundsAnimDuration) {
-        if (imageToWrapCropBoundsAnimDuration > 0) {
-            mImageToWrapCropBoundsAnimDuration = imageToWrapCropBoundsAnimDuration;
-        } else {
-            throw new IllegalArgumentException("Animation duration cannot be negative value.");
-        }
-    }
 
     /**
      * This method sets multiplier that is used to calculate max image scale from min image scale.
@@ -240,15 +120,6 @@ public class CropImageView extends TransformImageView {
         } else if (deltaScale < 1 && getCurrentScale() * deltaScale >= getMinScale()) {
             super.postScale(deltaScale, px, py);
         }
-    }
-
-    /**
-     * This method rotates image for given angle related to the image center.
-     *
-     * @param deltaAngle - angle to rotate
-     */
-    public void postRotate(float deltaAngle) {
-        postRotate(deltaAngle, mCropRect.centerX(), mCropRect.centerY());
     }
 
     /**
@@ -373,9 +244,7 @@ public class CropImageView extends TransformImageView {
         float drawableWidth = drawable.getIntrinsicWidth();
         float drawableHeight = drawable.getIntrinsicHeight();
 
-        if (mTargetAspectRatio == SOURCE_IMAGE_ASPECT_RATIO) {
-            mTargetAspectRatio = drawableWidth / drawableHeight;
-        }
+        float mTargetAspectRatio = drawableWidth / drawableHeight;
 
         int height = (int) (mThisWidth / mTargetAspectRatio);
         if (height > mThisHeight) {
@@ -390,9 +259,6 @@ public class CropImageView extends TransformImageView {
         calculateImageScaleBounds(drawableWidth, drawableHeight);
         setupInitialImagePosition(drawableWidth, drawableHeight);
 
-        if (mCropBoundsChangeListener != null) {
-            mCropBoundsChangeListener.onCropAspectRatioChanged(mTargetAspectRatio);
-        }
         if (mTransformImageListener != null) {
             mTransformImageListener.onScale(getCurrentScale());
             mTransformImageListener.onRotate(getCurrentAngle());
@@ -491,22 +357,6 @@ public class CropImageView extends TransformImageView {
         mCurrentImageMatrix.postScale(initialMinScale, initialMinScale);
         mCurrentImageMatrix.postTranslate(tw, th);
         setImageMatrix(mCurrentImageMatrix);
-    }
-
-    /**
-     * This method extracts all needed values from the styled attributes.
-     * Those are used to configure the view.
-     */
-    @SuppressWarnings("deprecation")
-    protected void processStyledAttributes(@NonNull TypedArray a) {
-        float targetAspectRatioX = Math.abs(a.getFloat(R.styleable.ucrop_UCropView_ucrop_aspect_ratio_x, DEFAULT_ASPECT_RATIO));
-        float targetAspectRatioY = Math.abs(a.getFloat(R.styleable.ucrop_UCropView_ucrop_aspect_ratio_y, DEFAULT_ASPECT_RATIO));
-
-        if (targetAspectRatioX == SOURCE_IMAGE_ASPECT_RATIO || targetAspectRatioY == SOURCE_IMAGE_ASPECT_RATIO) {
-            mTargetAspectRatio = SOURCE_IMAGE_ASPECT_RATIO;
-        } else {
-            mTargetAspectRatio = targetAspectRatioX / targetAspectRatioY;
-        }
     }
 
     /**

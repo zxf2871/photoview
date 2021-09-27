@@ -1,24 +1,14 @@
 package com.b8a3.photoview;
 
-import android.graphics.PixelFormat;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-
-import com.github.chrisbanes.photoview.PhotoView;
-import com.ortiz.touchview.TouchImageView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
-import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
     private LinearLayout mContainer;
@@ -48,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void openUC(View view) {
 
-
+    }
 }

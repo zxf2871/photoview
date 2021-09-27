@@ -1,4 +1,4 @@
-package com.yalantis.ucrop.util;
+package com.b8a3.photoview.zoom;
 
 public final class CubicEasing {
 

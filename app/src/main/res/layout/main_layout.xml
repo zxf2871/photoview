@@ -15,17 +15,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
+            <com.b8a3.photoview.zoom.ZoomImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/car_"/>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:text="@string/app_name" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:text="@string/app_name" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
+                android:onClick="openUC"
                 android:text="@string/app_name" />
             <TextView
                 android:layout_width="match_parent"
@@ -42,13 +41,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal">
-
-                    <ImageView
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:adjustViewBounds="true"
-                        android:src="@drawable/car_" />
+                        android:orientation="vertical">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ucrop_ic_crop"/>
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:adjustViewBounds="true"
+                            android:src="@drawable/car_" />
+                    </LinearLayout>
+
                 </com.b8a3.photoview.view.FullScreenImageLayout>
             </FrameLayout>
 
