@@ -32,16 +32,14 @@ public class FullViewAttacher implements View.OnTouchListener,
 
             @Override
             public boolean onScaleBegin(ScaleGestureDetector detector) {
-                layout.requestDisallowInterceptTouchEvent(true);
-                mOnGestureViewListener.onScaleBegin();
+//                layout.requestDisallowInterceptTouchEvent(true);
+//                mOnGestureViewListener.onScaleBegin();
 
                 return true;
             }
 
             @Override
             public void onScaleEnd(ScaleGestureDetector detector) {
-                layout.requestDisallowInterceptTouchEvent(false);
-                mOnGestureViewListener.onScaleEnd();
 
             }
         });
@@ -54,6 +52,13 @@ public class FullViewAttacher implements View.OnTouchListener,
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            mOnGestureViewListener.onScaleBegin();
+        }
+
+        if(event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL){
+            mOnGestureViewListener.onScaleEnd();
+        }
         return mDetector.onTouchEvent(event);
     }
 }

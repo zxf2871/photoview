@@ -6,6 +6,11 @@
     android:orientation="vertical"
     android:background="#30000000">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:gravity="center"
+        android:text="ScaleTextView" />
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -16,20 +21,10 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.b8a3.photoview.zoom.ZoomImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:src="@drawable/car_"/>
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:onClick="openUC"
-                android:text="@string/app_name" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:text="@string/app_name" />
+                android:text="@string/app_name"/>
 
             <FrameLayout
                 android:layout_width="match_parent"
