@@ -34,7 +34,6 @@ public class ZoomFullScreenLayout extends FrameLayout {
     private ViewGroup mDecorView;//用来承载view的最上层界面
     private View mOriView; //从原布局拿出来的view
     private ViewGroup.LayoutParams mOriLp; //原view的参数lp
-    private ViewGroup mOriParent; //原view的父布局
     private View mPlaceHolderView;//用来放到原来的位置, 占位用的view
 
     private final int[] mOriTopLeft = new int[2];
@@ -99,8 +98,8 @@ public class ZoomFullScreenLayout extends FrameLayout {
                 //mOriImageView.setVisibility(VISIBLE);
                 //把占位view拿出来, 把原来的view放回去
                 mDecorView.removeView(mOriView);
-                mOriParent.removeView(mPlaceHolderView);
-                mOriParent.addView(mOriView, mOriLp);
+                removeView(mPlaceHolderView);
+                addView(mOriView, mOriLp);
                 mState = STATE_DEFAULT;
             }
         });
@@ -134,10 +133,9 @@ public class ZoomFullScreenLayout extends FrameLayout {
 
                             //把原来的view拿出来, 把占位view放进去
                             mOriLp = mOriView.getLayoutParams();
-                            mOriParent = (ViewGroup) mOriView.getParent();
-                            mOriParent.removeView(mOriView);
+                            removeView(mOriView);
                             mPlaceHolderView.setId(mOriView.getId());
-                            mOriParent.addView(mPlaceHolderView, new LinearLayout.LayoutParams(mOriView.getWidth(), mOriView.getHeight()));
+                            addView(mPlaceHolderView, new LinearLayout.LayoutParams(mOriView.getWidth(), mOriView.getHeight()));
                             mDecorView.addView(mOriView, lp);
 
                             //修复因为阈值引起的第一帧跳变
@@ -202,8 +200,9 @@ public class ZoomFullScreenLayout extends FrameLayout {
                 } else if (action == MotionEvent.ACTION_MOVE) {
                     float x1 = event.getX();
                     float y1 = event.getY();
+                    Log.e("------>", "x1 - moveX:" + (x1 - moveX) + " y1 - moveY:" + (y1 - moveY));
                     if (mState == STATE_DEFAULT) {
-                        if (Math.abs(x1 - moveX) < 4 && Math.abs(y1 - moveY) < 4) {
+                        if (Math.abs(x1 - moveX) < 2 && Math.abs(y1 - moveY) < 2 || Math.abs(y1 - moveY) > 15) {
                             requestDisallowInterceptTouchEvent(false);
                         }
                     }
