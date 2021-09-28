@@ -12,10 +12,9 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-
-import com.b8a3.photoview.R;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,7 +33,7 @@ public class ZoomFullScreenLayout extends FrameLayout {
     private ViewGroup mDecorView;//用来承载view的最上层界面
     private View mOriView; //从原布局拿出来的view
     private ViewGroup.LayoutParams mOriLp; //原view的参数lp
-    private View mPlaceHolderView;//用来放到原来的位置, 占位用的view
+    private final View mPlaceHolderView = new View(getContext());//用来放到原来的位置, 占位用的view
 
     private final int[] mOriTopLeft = new int[2];
 
@@ -48,23 +47,44 @@ public class ZoomFullScreenLayout extends FrameLayout {
 
     public ZoomFullScreenLayout(@NonNull Context context) {
         super(context);
-        init((Activity) context);
+        init(context);
     }
 
     public ZoomFullScreenLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init((Activity) context);
+        init(context);
     }
 
     public ZoomFullScreenLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init((Activity) context);
+        init(context);
     }
 
-    public void init(Activity activity) {
-        mActivity = activity;
-        mPlaceHolderView = new View(activity);
-        mPlaceHolderView.setBackgroundResource(R.color.green);
+    private void init(Context context) {
+
+    }
+
+    public Activity getActivity() {
+        if (mActivity != null) {
+            return mActivity;
+        }
+        if (getContext() instanceof Activity) {
+            mActivity = (Activity) getContext();
+            return mActivity;
+        }
+        mActivity = getParentActivity(getParent());
+        return mActivity;
+    }
+
+    private Activity getParentActivity(ViewParent viewGroup) {
+        if (!(viewGroup instanceof ViewGroup)) {
+            return null;
+        }
+        if (((ViewGroup) viewGroup).getContext() instanceof Activity) {
+            return (Activity) ((ViewGroup) viewGroup).getContext();
+        } else {
+            return getParentActivity(viewGroup.getParent());
+        }
     }
 
     private void backToOri() {
@@ -109,7 +129,7 @@ public class ZoomFullScreenLayout extends FrameLayout {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        if (mActivity != null) {
+        if (getActivity() != null) {
             int action = event.getActionMasked();
             if (mState == STATE_READY) {//准备
                 int pointerCount = event.getPointerCount();
@@ -125,7 +145,7 @@ public class ZoomFullScreenLayout extends FrameLayout {
 
                         double distance = getDistance(x1, y1, x2, y2);
                         if (Math.abs(distance - mLastDistance) >= 10) {
-                            mDecorView = (ViewGroup) mActivity.getWindow().getDecorView();
+                            mDecorView = (ViewGroup) getActivity().getWindow().getDecorView();
                             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(mOriView.getWidth(), mOriView.getHeight());
                             lp.topMargin = mOriTopLeft[1];
                             lp.leftMargin = mOriTopLeft[0];
@@ -170,10 +190,13 @@ public class ZoomFullScreenLayout extends FrameLayout {
                     mOriView.setTranslationY(halfY);
 
                     //处理图片的放大缩小
-                    double distence = getDistance(x1, y1, x2, y2);
-                    double scaleFactor = distence / mLastDistance;
-                    mOriView.setScaleX((float) scaleFactor);
-                    mOriView.setScaleY((float) scaleFactor);
+                    double distance = getDistance(x1, y1, x2, y2);
+                    double scaleFactor = distance / mLastDistance;
+                    //只处理放大
+                    if (scaleFactor > 1f) {
+                        mOriView.setScaleX((float) scaleFactor);
+                        mOriView.setScaleY((float) scaleFactor);
+                    }
                 }
                 return true;
             } else if (mState == STATE_RESTORE) {//返回原位置中
@@ -212,11 +235,6 @@ public class ZoomFullScreenLayout extends FrameLayout {
             }
         }
         return super.onTouchEvent(event);
-    }
-
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return true;
     }
 
     public View getTargetView() {
